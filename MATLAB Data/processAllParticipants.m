@@ -32,15 +32,16 @@ participants = fieldnames(participantSet);
 % process each participants' data
 for i = 1:numel(participants)
     if (participants{i}(1) == 'P')
+        participants(i)
         participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
     else 
+        participants(i)
         participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}));
     end
 end
 
 % and now we have the whole set!
 end
-
 
 %%
 function [ p ] = processOneParticipant( pData )
@@ -130,14 +131,15 @@ function [ p ] = processOneTraining ( pData )
 
 %%% Event Codes %%%
 
-HAPPY       = '1';
-NEUTRAL     = '2';
-SAD         = '3';
+HAPPY       = 1;
+NEUTRAL     = 2;
+SAD         = 3;
 
 %%% Constants and Input Data %%%
 
 alpha       = pData.EEG(1).data;
 beta        = pData.EEG(2).data;
+a = alpha(1,:,:);
 events      = pData.EEG(1).event;
 nBands      = numel(pData.EEG);
 nChans      = size(alpha, 1);
@@ -171,7 +173,8 @@ for i = 1:nEpochs
     elseif (events(i).type == SAD)
         s = s+1;
         filteredData.sad(s,1,:,:) = alpha(:,:,j);
-        filteredData.sad(s,2,:,:) = beta(:,:,j);        
+        filteredData.sad(s,2,:,:) = beta(:,:,j);  
+        temp = filteredData.sad(:,:,:,1);
         j = j+1;
     else
         % ERROR
@@ -188,7 +191,8 @@ processedData = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nB
 labels  = fieldnames(processedData);
 
 % Get PSD %
-for i = 1:numel(labels)
+nLabels = size(labels,1);
+for i = 1:nLabels
     nTrials = size(filteredData.(labels{i}),1);
     filteredData.(labels{i});
     
@@ -265,7 +269,8 @@ function [ processedData ] = normalize_training( processedData )
 
 states      = fieldnames(processedData);
 nStates     = numel (states);
-nTrials     = size (processedData.(states{1}), 1);
+%nTrials     = size (processedData.(states{1}), 1);
+nTrials     = 3;
 nBands      = size (processedData.(states{1}), 2); 
 nChans      = size (processedData.(states{1}), 3);
 nPerState   = nTrials * nBands * nChans;
@@ -275,10 +280,11 @@ matrix = zeros(nElements, 1);
 
 % unfold data
 for i = 1:nStates
+    
     front   = (i - 1) * nPerState + 1;
     back    = (i) * nPerState;
     
-    matrix(front:back) = reshape(processedData.(states{1}), nPerState, 1);
+    matrix(front:back) = reshape(processedData.(states{i}), nPerState, 1);
 end
 
 matrix_normalized = normalize_1D (matrix);
