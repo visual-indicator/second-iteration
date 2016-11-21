@@ -1,11 +1,7 @@
 function [ svmMatrix, svmClassifier ] = trainSVM ( participantSet )
+% TRAINSVM Output the data within participantSet as a matrix and vector
+% Usage: [svmMatrix, svmClassifier] = trainSVM(participantSet);
 
-% 1. determine number of Training sets
-% 2. build svm matrix with zeros (so it doesn't get slow as it grows and rewrites)
-% 3. Find all participant sets (outer for loop)
-% 4. lots of for loops to get all the data within processedData
-% 5. save that data to the svm matrix  and save 
-    
 % For classification
 
 HAPPY           = 1;
@@ -46,7 +42,7 @@ for i = 1:nParticipants
     name = cell2mat(participants(i));
     participant = participantSet.(name);
     
-    if (name(i) == 'T')
+    if (name(1) == 'T')
         % it's training data 
         states  = fieldnames (participant.processedData);
         nStates = numel (states);
