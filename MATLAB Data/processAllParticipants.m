@@ -118,7 +118,7 @@ processedData.baseline    = getSumPSD(filteredData.baseline);
 
 % normalize data
 
-processedData = normalize(processedData);
+processedData = normalize_colors(processedData);
 
 p.processedData = processedData;
 
@@ -187,6 +187,7 @@ processedData = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nB
 
 labels  = fieldnames(processedData);
 
+% Get PSD %
 for i = 1:numel(labels)
     nTrials = size(filteredData.(labels{i}),1);
     filteredData.(labels{i});
@@ -197,6 +198,11 @@ for i = 1:numel(labels)
         processedData.(labels{i})(j,:,:) = getSumPSD(temp);
     end
 end
+
+% Normalize the Participant's Data %
+processedData = normalize_training(processedData);
+
+p.processedData = processedData;
 
 end
 
@@ -223,7 +229,7 @@ end
 
 
 %%
-function [ processedData ] = normalize ( processedData )
+function [ processedData ] = normalize_colors ( processedData )
 
 colors              = fieldnames(processedData);
 [nBands, nChans]    = size (processedData.(colors{1}));
@@ -253,6 +259,40 @@ end
 
 end
 
+
+%%
+function [ processedData ] = normalize_training( processedData )
+
+states      = fieldnames(processedData);
+nStates     = numel (states);
+nTrials     = size (processedData.(states{1}), 1);
+nBands      = size (processedData.(states{1}), 2); 
+nChans      = size (processedData.(states{1}), 3);
+nPerState   = nTrials * nBands * nChans;
+nElements   = nStates * nPerState;
+
+matrix = zeros(nElements, 1);
+
+% unfold data
+for i = 1:nStates
+    front   = (i - 1) * nPerState + 1;
+    back    = (i) * nPerState;
+    
+    matrix(front:back) = reshape(processedData.(states{1}), nPerState, 1);
+end
+
+matrix_normalized = normalize_1D (matrix);
+
+% fold data back up
+for i = 1:nStates
+    front   = (i - 1) * nPerState + 1;
+    back    = (i) * nPerState;
+    
+    temp    = matrix_normalized(front:back);
+    processedData.(states{i}) = reshape(temp, nTrials, nBands, nChans);
+end
+
+end
 
 %% 
 function [ matrix_normalized ] = normalize_1D ( matrix ) 
