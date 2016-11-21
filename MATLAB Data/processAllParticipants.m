@@ -25,12 +25,17 @@ for i = 1:nSets
        % it's not filtered data
    end
 end
+% This should separate T's from P's
 
 participants = fieldnames(participantSet);
 
 % process each participants' data
 for i = 1:numel(participants)
-   participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
+    if (participants{i}(1) == 'P')
+        participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
+    else 
+        participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}));
+    end
 end
 
 % and now we have the whole set!
@@ -50,7 +55,6 @@ BLUE        = 7;
 GREEN       = 1;
 RED         = 2;
 BASELINE    = 4;
-WHOOPS      = 0;
 
 %%% Constants and Input Data %%%
 
@@ -66,42 +70,39 @@ numEpochs = 5;
 temp = zeros(nBands, nChans, nSamps);         
 
 %%% Create Person Struct %%%
-p       = struct('data', [], 'processedData', []); 
-rawData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
+p       = struct('filteredData', [], 'processedData', []); 
+filteredData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
 n = 1;
 
 for i = 1:numEpochs
     if (events(i).type == YELLOW)
-        rawData.yellow(1,:,:) = alpha(:,:,n);
-        rawData.yellow(2,:,:) = beta(:,:,n);
+        filteredData.yellow(1,:,:) = alpha(:,:,n);
+        filteredData.yellow(2,:,:) = beta(:,:,n);
         n = n+1;
     elseif (events(i).type == BLUE)
-        rawData.blue(1,:,:) = alpha(:,:,n);
-        rawData.blue(2,:,:) = beta(:,:,n);        
+        filteredData.blue(1,:,:) = alpha(:,:,n);
+        filteredData.blue(2,:,:) = beta(:,:,n);        
         n = n+1;
     elseif (events(i).type == GREEN)
-        rawData.green(1,:,:) = alpha(:,:,n);
-        rawData.green(2,:,:) = beta(:,:,n);        
+        filteredData.green(1,:,:) = alpha(:,:,n);
+        filteredData.green(2,:,:) = beta(:,:,n);        
         n = n+1;
     elseif (events(i).type == RED)
-        rawData.red(1,:,:) = alpha(:,:,n);
-        rawData.red(2,:,:) = beta(:,:,n);        
+        filteredData.red(1,:,:) = alpha(:,:,n);
+        filteredData.red(2,:,:) = beta(:,:,n);        
         n = n+1;
     elseif (events(i).type == BASELINE)
-        rawData.baseline(1,:,:) = alpha(:,:,n);
-        rawData.baseline(2,:,:) = beta(:,:,n);
+        filteredData.baseline(1,:,:) = alpha(:,:,n);
+        filteredData.baseline(2,:,:) = beta(:,:,n);
         n = n+1;
-    elseif (events(i).type == WHOOPS)
-        % this is to catch the events labeled '0' that weren't supposed to
-        % exist :)
     else
         % ERROR
         % Print something to say that we messed up
     end
 end
 
-p.data = rawData;
+p.filteredData = filteredData;
 
 
 %%% Process Each Trial %%%
@@ -109,11 +110,11 @@ p.data = rawData;
 temp = zeros(nBands, nChans);
 processedData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
-processedData.yellow      = getSumPSD(rawData.yellow);
-processedData.blue        = getSumPSD(rawData.blue);
-processedData.green       = getSumPSD(rawData.green);
-processedData.red         = getSumPSD(rawData.red);
-processedData.baseline    = getSumPSD(rawData.baseline);
+processedData.yellow      = getSumPSD(filteredData.yellow);
+processedData.blue        = getSumPSD(filteredData.blue);
+processedData.green       = getSumPSD(filteredData.green);
+processedData.red         = getSumPSD(filteredData.red);
+processedData.baseline    = getSumPSD(filteredData.baseline);
 
 % normalize data
 
@@ -125,14 +126,77 @@ end
 
 
 %% 
-function [] = processOneTraining ( pData )
+function [ p ] = processOneTraining ( pData )
 
-alpha   = pData.EEG(1).data;
-beta    = pData.EEG(2).data;
-events  = pData.EEG(1).event;
-nBands  = 2;
-nChans  = 6;
-nSamps  = 2500;
+%%% Event Codes %%%
+
+HAPPY       = '1';
+NEUTRAL     = '2';
+SAD         = '3';
+
+%%% Constants and Input Data %%%
+
+alpha       = pData.EEG(1).data;
+beta        = pData.EEG(2).data;
+events      = pData.EEG(1).event;
+nBands      = numel(pData.EEG);
+nChans      = size(alpha, 1);
+nSamps      = size(alpha, 2);
+nEpochs     = size(alpha, 3);
+
+temp = zeros(1, nBands, nChans, nSamps);         
+
+%%% Create Person Struct %%%
+p               = struct('filteredData', [], 'processedData', []); 
+filteredData    = struct('happy', temp, 'neutral', temp, 'sad', temp);
+
+j   = 1;
+h   = 0;
+n   = 0;
+s   = 0; 
+
+%%% Restructure Filtered Data %%%
+
+for i = 1:nEpochs
+    if (events(i).type == HAPPY)
+        h = h+1;
+        filteredData.happy(h,1,:,:) = alpha(:,:,j);
+        filteredData.happy(h,2,:,:) = beta(:,:,j);
+        j = j+1;
+    elseif (events(i).type == NEUTRAL)
+        n = n+1;
+        filteredData.neutral(n,1,:,:) = alpha(:,:,j);
+        filteredData.neutral(n,2,:,:) = beta(:,:,j);        
+        j = j+1;
+    elseif (events(i).type == SAD)
+        s = s+1;
+        filteredData.sad(s,1,:,:) = alpha(:,:,j);
+        filteredData.sad(s,2,:,:) = beta(:,:,j);        
+        j = j+1;
+    else
+        % ERROR
+        % Print something to say that we messed up
+    end
+end
+
+p.filteredData = filteredData;
+
+%%% Process Data %%%
+
+processedData = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nBands, nChans), 'sad', zeros(s, nBands, nChans));
+
+labels  = fieldnames(processedData);
+
+for i = 1:numel(labels)
+    nTrials = size(filteredData.(labels{i}),1);
+    filteredData.(labels{i});
+    
+    for j = 1:nTrials
+        %processedData.(labels{i})(j,:,:) = filteredData.happy(1,1,:,:);
+        temp = squeeze(filteredData.(labels{i})(j,:,:,:));
+        processedData.(labels{i})(j,:,:) = getSumPSD(temp);
+    end
+end
 
 end
 
