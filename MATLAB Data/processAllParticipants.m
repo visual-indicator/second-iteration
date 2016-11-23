@@ -284,7 +284,6 @@ function [ processedData ] = normalize_training( processedData )
 states      = fieldnames(processedData);
 nStates     = numel (states);
 nTrials     = size (processedData.(states{1}), 1);
-%nTrials     = 3;
 nBands      = size (processedData.(states{1}), 2); 
 nChans      = size (processedData.(states{1}), 3);
 nPerState   = nTrials * nBands * nChans;
