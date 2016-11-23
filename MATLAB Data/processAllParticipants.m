@@ -45,7 +45,6 @@ end
 
 %%
 function [ p ] = processOneParticipant( pData )
-%function [ p1 ] = processOneParticipant ( participantNumber, alphaData, betaData, events )
 %PROCESSONEPARTICIPANT Bad explanation
 % Continuing to not explain things
 
@@ -139,7 +138,6 @@ SAD         = 3;
 
 alpha       = pData.EEG(1).data;
 beta        = pData.EEG(2).data;
-a = alpha(1,:,:);
 events      = pData.EEG(1).event;
 nBands      = numel(pData.EEG);
 nChans      = size(alpha, 1);
@@ -174,7 +172,6 @@ for i = 1:nEpochs
         s = s+1;
         filteredData.sad(s,1,:,:) = alpha(:,:,j);
         filteredData.sad(s,2,:,:) = beta(:,:,j);  
-        temp = filteredData.sad(:,:,:,1);
         j = j+1;
     else
         % ERROR
@@ -204,7 +201,7 @@ for i = 1:nLabels
 end
 
 % Normalize the Participant's Data %
-processedData = normalize_training(processedData);
+%processedData = normalize_training(processedData);
 
 p.processedData = processedData;
 

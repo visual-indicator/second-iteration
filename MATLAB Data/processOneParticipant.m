@@ -1,6 +1,6 @@
-function [ p1, unclassified ] = processOneParticipant( EEG )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function [ p1, processedData ] = processOneParticipant( EEG )
+%PROCESSONEPARTICIPANT Bad explanation
+% Continuing to not explain things
 
 %%% Event codes %%%
 
@@ -13,29 +13,23 @@ WHOOPS      = 0;
 
 %%% Constants and Input Data %%%
 
-alphaData   = EEG(1).data;      % Alpha activity from all trials
-betaData    = EEG(2).data;      % Beta activity from all trials
-data        = EEG(1:2).data;    % Alpha and Beta activity from all trials
 events      = EEG(1).event;     % Events from data set
-nEpochs     = size(events,2);   % Declare the number of epochs
-nSamples    = size(betaData,2); % Declare the number of samples in each trial
-nChannels   = size(betaData,1); % Declare the number of channels used
+%nEpochs     = size(events,2);   % Declare the number of epochs
+nSamples    = size(EEG(2).data,2); % Declare the number of samples in each trial
+nChannels   = size(EEG(2).data,1); % Declare the number of channels used
 nBands      = 2;
 % TEMPORARY: allows us to only deal with ONE of each color
-numEpochs = 5;
+nEpochs = 5;
 
-temp = zeros(2,6,2500);         
+temp = zeros(nBands, nChannels, nSamples);         
 
-p1      = struct('data', [], 'unclassified', []); 
+%%% Create Person Struct %%%
+p1      = struct('data', [], 'processedData', []); 
 rawData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
 n = 1;
 
-%%% Create Person Struct %%%
-
-
-
-for i = 1:numEpochs
+for i = 1:nEpochs
     if (events(i).type == YELLOW)
         rawData.yellow(1,:,:) = EEG(1).data(:,:,n);
         rawData.yellow(2,:,:) = EEG(2).data(:,:,n);
@@ -71,19 +65,19 @@ p1.data = rawData;
 %%% Process Each Trial %%%
 
 temp = zeros(2,6);
-unclassified = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
+processedData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
-unclassified.yellow      = getSumPSD(rawData.yellow);
-unclassified.blue        = getSumPSD(rawData.blue);
-unclassified.green       = getSumPSD(rawData.green);
-unclassified.red         = getSumPSD(rawData.red);
-unclassified.baseline    = getSumPSD(rawData.baseline);
+processedData.yellow      = getSumPSD(rawData.yellow);
+processedData.blue        = getSumPSD(rawData.blue);
+processedData.green       = getSumPSD(rawData.green);
+processedData.red         = getSumPSD(rawData.red);
+processedData.baseline    = getSumPSD(rawData.baseline);
 
 % normalize data
 
-unclassified = normalize(unclassified);
+processedData = normalize(processedData);
 
-p1.unclassified = unclassified;
+p1.processedData = processedData;
 
 end
 
@@ -111,10 +105,10 @@ end
 
 
 %%
-function [ unclassified ] = normalize ( unclassified )
+function [ processedData ] = normalize ( processedData )
 
-colors              = fieldnames(unclassified);
-[nBands, nChans]    = size (unclassified.(colors{1}));
+colors              = fieldnames(processedData);
+[nBands, nChans]    = size (processedData.(colors{1}));
 nColors             = numel (colors);
 valsPerColor        = nBands * nChans;
 
@@ -125,7 +119,7 @@ for i = 1:nColors
     front   = (i - 1) * valsPerColor + 1;
     back    = (i) * valsPerColor;
     
-    matrix(front:back) = reshape(unclassified.(colors{1}), valsPerColor, 1);
+    matrix(front:back) = reshape(processedData.(colors{1}), valsPerColor, 1);
 end
 
 matrix_normalized = normalize_1D (matrix);
@@ -136,7 +130,7 @@ for i = 1:nColors
     back    = (i) * valsPerColor;
     
     temp    = matrix_normalized(front:back);
-    unclassified.(colors{i}) = reshape(temp, nBands, nChans);
+    processedData.(colors{i}) = reshape(temp, nBands, nChans);
 end
 
 end
