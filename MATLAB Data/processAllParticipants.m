@@ -1,6 +1,14 @@
 function [ participantSet ] = processAllParticipants ( EEG )
 %PROCESSALLPARTICIPANTS Processes all participants data
 % Open all data sets in EEGLab
+  
+%%% Options %%%
+
+% Normalize by person (default) or by feature (set below to TRUE)
+normalizeByFeature = false;
+
+
+%%% Read and Separate Participant Data %%%
 
 participantSet = struct();
 
@@ -33,18 +41,23 @@ participants = fieldnames(participantSet);
 for i = 1:numel(participants)
     if (participants{i}(1) == 'P')
         participants(i)
-        participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
+        participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}), normalizeByFeature);
     else 
         participants(i)
-        participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}));
+        participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}), normalizeByFeature);
     end
+end
+
+if (normalizeByFeature)
+    % load the processedData of each participant, normalize each row, then
+    % put it back
 end
 
 % and now we have the whole set!
 end
 
 %%
-function [ p ] = processOneParticipant( pData )
+function [ p ] = processOneParticipant( pData, normalizeByFeature )
 %PROCESSONEPARTICIPANT Bad explanation
 % Continuing to not explain things
 
@@ -116,9 +129,11 @@ processedData.green       = getSumPSD(filteredData.green);
 processedData.red         = getSumPSD(filteredData.red);
 processedData.baseline    = getSumPSD(filteredData.baseline);
 
-% normalize data
+% normalize data 
 
-processedData = normalize_colors(processedData);
+if (normalizeByFeature == false)
+    processedData = normalize_colors(processedData);
+end
 
 p.processedData = processedData;
 
@@ -126,7 +141,7 @@ end
 
 
 %% 
-function [ p ] = processOneTraining ( pData )
+function [ p ] = processOneTraining ( pData, normalizeByFeature )
 
 %%% Event Codes %%%
 
@@ -201,7 +216,9 @@ for i = 1:nLabels
 end
 
 % Normalize the Participant's Data %
-%processedData = normalize_training(processedData);
+if (normalizeByFeature == false)
+    processedData = normalize_training(processedData);
+end
 
 p.processedData = processedData;
 
@@ -266,8 +283,8 @@ function [ processedData ] = normalize_training( processedData )
 
 states      = fieldnames(processedData);
 nStates     = numel (states);
-%nTrials     = size (processedData.(states{1}), 1);
-nTrials     = 3;
+nTrials     = size (processedData.(states{1}), 1);
+%nTrials     = 3;
 nBands      = size (processedData.(states{1}), 2); 
 nChans      = size (processedData.(states{1}), 3);
 nPerState   = nTrials * nBands * nChans;
@@ -291,8 +308,7 @@ for i = 1:nStates
     front   = (i - 1) * nPerState + 1;
     back    = (i) * nPerState;
     
-    temp    = matrix_normalized(front:back);
-    processedData.(states{i}) = reshape(temp, nTrials, nBands, nChans);
+    processedData.(states{i}) = reshape(matrix_normalized(front:back), nTrials, nBands, nChans);
 end
 
 end
