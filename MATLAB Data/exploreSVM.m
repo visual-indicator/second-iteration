@@ -1,12 +1,26 @@
-
-
+%load filtered data set
 load('participantSet.mat');
 
+%rearrange data format for SVM
 [X, Y] = trainSVM(participantSet);
-trainingSetNum = 18;
+
+%only look at the firs 18 training sets
+Y = Y(1:18,:);
+X = X(1:18,:);
+
+%set trainingSetNum based on X number of rows
+trainingSetNum = size(X, 1);
+
+%train linear SVM
+%Mdl = fitcecoc(X, Y);
+
+%traing gaussian SVM
+t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+Mdl = fitcecoc(X,Y,'Learners',t);
+
 
 %%%%%%%%%%%%%%%%%%%%% #1 Alpha beta value for each channel%%%%%%%%%%%%%%%%%%%%%%%
-Mdl = fitcecoc(X, Y);
+
 predictedResultONE = zeros(trainingSetNum,1);
 
 for i = 1:trainingSetNum
