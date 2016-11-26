@@ -25,7 +25,7 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue>record-[$core{date}-$core{time}].edf</DefaultValue>
-					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Participant-10-[$core{date}-$core{time}].edf</Value>
+					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Train-Participant-05-[$core{date}-$core{time}].edf</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 			</Settings>
@@ -40,7 +40,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>351.000000</Value>
+					<Value>353.000000</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -52,7 +52,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x002ca149)</Value>
+					<Value>(0x00000000, 0x003bf72a)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -91,14 +91,14 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue>record-[$core{date}-$core{time}].gdf</DefaultValue>
-					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Participant-10-[$core{date}-$core{time}].gdf</Value>
+					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Train-Participant-05-[$core{date}-$core{time}].gdf</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 			</Settings>
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>272.000000</Value>
+					<Value>270.000000</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x1fa963f5, 0x1a638cd4)</Identifier>
@@ -106,7 +106,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>256.000000</Value>
+					<Value>257.000000</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -118,7 +118,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x005c8970)</Value>
+					<Value>(0x00000000, 0x003e20cb)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -204,7 +204,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x001b0024)</Value>
+					<Value>(0x00000000, 0x001bb8b8)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -334,7 +334,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x00382a13)</Value>
+					<Value>(0x00000000, 0x002e7713)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -365,7 +365,7 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue>${Path_Data}/plugins/stimulation/simple-keyboard-to-stimulations.txt</DefaultValue>
-					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Config/KeyboardConfig.txt</Value>
+					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Config/KeyboardConfigTraining.txt</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 			</Settings>
@@ -392,7 +392,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x003f1c7d)</Value>
+					<Value>(0x00000000, 0x00425297)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -473,7 +473,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x0083ec99)</Value>
+					<Value>(0x00000000, 0x007aaef7)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -572,7 +572,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x002949a9)</Value>
+					<Value>(0x00000000, 0x00225748)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc73e83ec, 0xf855c5bc)</Identifier>
@@ -607,7 +607,7 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue>record-[$core{date}-$core{time}].csv</DefaultValue>
-					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Participant-10-[$core{date}-$core{time}].csv</Value>
+					<Value>C:/Users/Amanda/Documents/MATLAB/Emotions/OpenVibe Data/Train-Participant-05-[$core{date}-$core{time}].csv</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 				<Setting>
@@ -652,7 +652,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc46b3d00, 0x3e0454e1)</Identifier>
-					<Value>(0x00000000, 0x00da6e77)</Value>
+					<Value>(0x00000000, 0x00f53c5f)</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0xc67a01dc, 0x28ce06c1)</Identifier>
@@ -724,11 +724,11 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x3f0a3b27, 0x570913d2)</Identifier>
-					<Value>256</Value>
+					<Value>254</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>271</Value>
+					<Value>272</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
@@ -753,11 +753,11 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x3f0a3b27, 0x570913d2)</Identifier>
-					<Value>256</Value>
+					<Value>254</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>256</Value>
+					<Value>257</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
@@ -786,7 +786,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>351</Value>
+					<Value>353</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
@@ -844,7 +844,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>366</Value>
+					<Value>368</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
@@ -873,7 +873,7 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>336</Value>
+					<Value>338</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
@@ -927,11 +927,11 @@
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x3f0a3b27, 0x570913d2)</Identifier>
-					<Value>256</Value>
+					<Value>254</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x6267b5c5, 0x676e3e42)</Identifier>
-					<Value>241</Value>
+					<Value>242</Value>
 				</Attribute>
 			</Attributes>
 		</Link>
