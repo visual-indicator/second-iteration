@@ -1,8 +1,13 @@
 %load filtered data set
-load('participantSetNotNormalized.mat');
+%load('participantSetNotNormalized.mat');
+%load('normalizedByFeature.mat');
+%load('normalizedByFeatureVector.mat');
 
 %rearrange data format for SVM
-[X, Y] = trainSVM(participantSetNotNormalized);
+%X = matrix;
+%Y = classifier;
+
+%[X, Y] = trainSVM(participantSetNotNormalized);
 
 %only look at the firs 18 training sets
 %Y = Y(1:18,:);
@@ -13,19 +18,19 @@ trainingSetNum = size(X, 1);
 
 %is linear svm = 0;
 %if gaussian svm = 1;
-svm = 0;
+svm = 1;
 
 
 %%%%%%%%%%%%%%%%%%%%% #1 Alpha and beta value for each channel%%%%%%%%%%%%%%%%%%%%%%%
 
-if (svm = 0)
+if (svm == 0)
     %train linear SVM
     Mdl = fitcecoc(X, Y);
-
-%traing gaussian SVM
-t = templateSVM('Standardize',1,'KernelFunction','gaussian');
-Mdl = fitcecoc(X,Y,'Learners',t);
-
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X,Y,'Learners',t);
+end
 
 predictedResultONE = zeros(trainingSetNum,1);
 
@@ -58,8 +63,14 @@ for i = 1:trainingSetNum
     X_LR_Alpha(i,3) = X(i,5)-X(i,6);
 end
 
-%train SVM
-Mdl = fitcecoc(X_LR_Alpha, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_LR_Alpha, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_LR_Alpha,Y,'Learners',t);
+end
 
 %get training results
 predictedResultTWO = zeros(trainingSetNum,1);
@@ -92,8 +103,14 @@ for i = 1:trainingSetNum
     X_LR_frontalAlpha(i,1) = X(i,1)-X(i,2);
 end
 
-%train SVM
-Mdl = fitcecoc(X_LR_frontalAlpha, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_LR_frontalAlpha, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_LR_frontalAlpha,Y,'Learners',t);
+end
 
 %get training results
 predictedResultTHREE = zeros(trainingSetNum,1);
@@ -131,8 +148,14 @@ for i = 1:trainingSetNum
     X_LR_AlphaBeta(i,6) = X(i,11)-X(i,12);
 end
 
-%train SVM
-Mdl = fitcecoc(X_LR_AlphaBeta, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_LR_AlphaBeta, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_LR_AlphaBeta,Y,'Learners',t);
+end
 
 %get training results
 predictedResultFOUR = zeros(trainingSetNum,1);
@@ -170,8 +193,14 @@ for i = 1:trainingSetNum
     X_BetaAlphaRatio(i,6) = X(i,12)/X(i,6);
 end
 
-%train SVM
-Mdl = fitcecoc(X_BetaAlphaRatio, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_BetaAlphaRatio, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_BetaAlphaRatio,Y,'Learners',t);
+end
 
 %get training results
 predictedResultFIVE = zeros(trainingSetNum,1);
@@ -209,8 +238,14 @@ for i = 1:trainingSetNum
     X_AlphaBetaRatio(i,6) = X(i,6)/X(i,12);
 end
 
-%train SVM
-Mdl = fitcecoc(X_AlphaBetaRatio, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_AlphaBetaRatio, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_AlphaBetaRatio,Y,'Learners',t);
+end
 
 %get training results
 predictedResultSIX = zeros(trainingSetNum,1);
@@ -244,8 +279,14 @@ for i = 1:trainingSetNum
     X_special(i,1) = X(i,4)/X(i,10) - X(i,3)/X(i,9);
 end
 
-%train SVM
-Mdl = fitcecoc(X_special, Y);
+if (svm == 0)
+    %train linear SVM
+    Mdl = fitcecoc(X_special, Y);
+elseif (svm == 1)
+    %traing gaussian SVM
+    t = templateSVM('Standardize',1,'KernelFunction','gaussian');
+    Mdl = fitcecoc(X_special,Y,'Learners',t);
+end
 
 %get training results
 predictedResultSeven = zeros(trainingSetNum,1);
@@ -266,5 +307,5 @@ end
 accuracyRate7 = 100 * numCorrect/trainingSetNum;
 
 %print accuracy rate
-output = sprintf('valence = ?F4/?F4-?F3/?F3: %.1f%%', accuracyRate7); 
+output = sprintf('valence = aF4/bF4-aF3/bF3: %.1f%%', accuracyRate7); 
 disp(output);
