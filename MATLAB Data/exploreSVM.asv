@@ -1,5 +1,4 @@
 %load filtered data set
-load('participantSet.mat');
 %load('participantSetNotNormalized.mat');
 %load('normalizedByFeature.mat');
 %load('normalizedByFeatureVector.mat');
@@ -9,7 +8,6 @@ load('participantSet.mat');
 %Y = classifier;
 
 %[X, Y] = trainSVM(participantSetNotNormalized);
-[X, Y] = trainSVM(participantSet);
 
 %only look at the firs 18 training sets
 %Y = Y(1:18,:);
@@ -18,7 +16,7 @@ load('participantSet.mat');
 %set trainingSetNum based on X number of rows
 trainingSetNum = size(X, 1);
 
-%if linear svm = 0;
+%is linear svm = 0;
 %if gaussian svm = 1;
 svm = 1;
 
