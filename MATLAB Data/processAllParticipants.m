@@ -41,12 +41,14 @@ participants = fieldnames(participantSet);
 for i = 1:numel(participants)
     if (participants{i}(1) == 'P')
         participants(i)
-        participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}), normalizeByFeature);
+        participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
     else 
         participants(i)
-        participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}), normalizeByFeature);
+        participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}));
     end
 end
+
+participantSet = normalizeDataByFeature(participantSet);
 
 if (normalizeByFeature)
     % load the processedData of each participant, normalize each row, then
@@ -57,7 +59,7 @@ end
 end
 
 %%
-function [ p ] = processOneParticipant( pData, normalizeByFeature )
+function [ p ] = processOneParticipant( pData )
 %PROCESSONEPARTICIPANT Bad explanation
 % Continuing to not explain things
 
@@ -83,7 +85,7 @@ numEpochs = 5;
 temp = zeros(nBands, nChans, nSamps);         
 
 %%% Create Person Struct %%%
-p       = struct('filteredData', [], 'processedData', []); 
+p       = struct('filteredData', []); 
 filteredData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
 n = 1;
@@ -121,27 +123,27 @@ p.filteredData = filteredData;
 %%% Process Each Trial %%%
 
 temp = zeros(nBands, nChans);
-processedData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
+notNormalized = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
-processedData.yellow      = getSumPSD(filteredData.yellow);
-processedData.blue        = getSumPSD(filteredData.blue);
-processedData.green       = getSumPSD(filteredData.green);
-processedData.red         = getSumPSD(filteredData.red);
-processedData.baseline    = getSumPSD(filteredData.baseline);
+notNormalized.yellow      = getSumPSD(filteredData.yellow);
+notNormalized.blue        = getSumPSD(filteredData.blue);
+notNormalized.green       = getSumPSD(filteredData.green);
+notNormalized.red         = getSumPSD(filteredData.red);
+notNormalized.baseline    = getSumPSD(filteredData.baseline);
 
 % normalize data 
 
-if (normalizeByFeature == false)
-    processedData = normalize_colors(processedData);
-end
+normalizedPerPerson             = normalize_colors(notNormalized);
+%normalizedByFeaturePerPerson    = normalize_colors_per_person(notNormalized);
 
-p.processedData = processedData;
+p.notNormalized         = notNormalized;
+p.normalizePerPerson    = normalizedPerPerson;
 
 end
 
 
 %% 
-function [ p ] = processOneTraining ( pData, normalizeByFeature )
+function [ p ] = processOneTraining ( pData )
 
 %%% Event Codes %%%
 
@@ -198,9 +200,9 @@ p.filteredData = filteredData;
 
 %%% Process Data %%%
 
-processedData = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nBands, nChans), 'sad', zeros(s, nBands, nChans));
+notNormalized = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nBands, nChans), 'sad', zeros(s, nBands, nChans));
 
-labels  = fieldnames(processedData);
+labels  = fieldnames(notNormalized);
 
 % Get PSD %
 nLabels = size(labels,1);
@@ -211,16 +213,18 @@ for i = 1:nLabels
     for j = 1:nTrials
         %processedData.(labels{i})(j,:,:) = filteredData.happy(1,1,:,:);
         temp = squeeze(filteredData.(labels{i})(j,:,:,:));
-        processedData.(labels{i})(j,:,:) = getSumPSD(temp);
+        notNormalized.(labels{i})(j,:,:) = getSumPSD(temp);
     end
 end
 
 % Normalize the Participant's Data %
-if (normalizeByFeature == false)
-    processedData = normalize_training(processedData);
-end
 
-p.processedData = processedData;
+normalizedPerPerson             = normalize_training(notNormalized);
+%normalizedByFeaturePerPerson    = normalize_training_per_person_and_feature(notNormalized);
+
+p.notNormalized                 = notNormalized;
+p.normalizePerPerson            = normalizedPerPerson;
+%p.normalizedByFeaturePerPerson  = normalizedByFeaturePerPerson;
 
 end
 
@@ -294,8 +298,11 @@ matrix = zeros(nElements, 1);
 % unfold data
 for i = 1:nStates
     
-    front   = (i - 1) * nPerState + 1;
-    back    = (i) * nPerState;
+    nTrials     = size(processedData.(states{i}),1);
+    nPerState   = nTrials * nBands * nChans;
+    
+    front       = (i - 1) * nPerState + 1;
+    back        = (i) * nPerState;
     
     matrix(front:back) = reshape(processedData.(states{i}), nPerState, 1);
 end
@@ -304,6 +311,45 @@ matrix_normalized = normalize_1D (matrix);
 
 % fold data back up
 for i = 1:nStates
+    nTrials     = size(processedData.(states{i}),1);
+    nPerState   = nTrials * nBands * nChans;
+    
+    front   = (i - 1) * nPerState + 1;
+    back    = (i) * nPerState;
+    
+    processedData.(states{i}) = reshape(matrix_normalized(front:back), nTrials, nBands, nChans);
+end
+
+end
+
+%%
+function [ processedData ] = normalize_training_per_person_and_feature( processedData )
+
+states      = fieldnames(processedData);
+nStates     = numel (states);
+nTrials     = size (processedData.(states{1}), 1);
+nBands      = size (processedData.(states{1}), 2); 
+nChans      = size (processedData.(states{1}), 3);
+nPerState   = nTrials * nBands * nChans;
+
+matrix = zeros(nTrials * nStates, nBands * nChans);
+
+% unfold data
+for i = 1:nStates
+    
+    nTrials     = size(processedData.(states{i}),1);
+    nPerState   = nTrials * nBands * nChans;
+    
+    %matrix(front:back) = reshape(processedData.(states{i}), nPerState, 1);
+end
+
+matrix_normalized = normalize_1D (matrix);
+
+% fold data back up
+for i = 1:nStates
+    nTrials     = size(processedData.(states{i}),1);
+    nPerState   = nTrials * nBands * nChans;
+    
     front   = (i - 1) * nPerState + 1;
     back    = (i) * nPerState;
     
@@ -338,5 +384,110 @@ den = max-min;
 
 for i = 1:size(matrix,1)
     matrix_normalized(i,1) = (matrix(i,1) - min) / den;
+end
+end
+
+%%
+function [ participantSet ] = normalizeDataByFeature ( participantSet )
+    % For classification
+
+HAPPY           = 1;
+NEUTRAL         = 2;
+SAD             = 3;
+
+nChans          = 6;
+nBands          = 2;
+nStates         = 3;
+nTrials         = 3;
+nParticipants   = numel(fieldnames(participantSet));
+participants    = fieldnames(participantSet);
+
+% Initialize nTrainingSets
+nTrainingSets   = 0;
+
+% Count the number of Training Sets
+for i = 1:nParticipants
+	name = cell2mat(participants(1));
+    
+    if (name(1) == 'T')
+        nTrainingSets = nTrainingSets + 1;
+    end 
+end
+
+% Create svmMatrix
+%  NOTE: Even if the data doesn't match this exactly, it will prevent us from
+%  having to re-create a matrix EVERY time. A few times wouldn't be too bad
+nRows           = nTrainingSets * nStates * nTrials;
+nCols           = nChans * nBands;
+data            = zeros (nRows, nCols);
+
+index = 1;
+
+% For each Participant
+for i = 1:nParticipants
+    name = cell2mat(participants(i));
+    participant = participantSet.(name);
+    
+    if (name(1) == 'T')
+        % it's training data 
+        states  = fieldnames (participant.notNormalized);
+        nStates = numel (states);
+
+        % For each State (for each participant)
+        for j = 1:nStates
+            state = participant.notNormalized.(states{j});
+            nTrials = size(state,1);
+            
+            % For each Trial (for each state for each participant)
+            for k = 1:nTrials
+                % get data within that trial and save to svmmatrix
+                temp = zeros (2*nChans, 1);
+                temp(1:nChans) = state(k,1,:);
+                temp(nChans+1:2*nChans)    = state(k,2,:);
+                data(index, :)  = temp;
+                index = index + 1;
+            end
+        end
+    else
+        %its not training data
+    end
+end
+
+for i = 1:size(data,2)
+   data(:,i) = normalize_1D(data(:,i)); 
+end
+
+index = 1;
+
+% put normalized data back
+for i = 1:nParticipants
+    name = cell2mat(participants(i));
+    participant = participantSet.(name);
+    
+    if (name(1) == 'T')
+        % it's training data 
+        states  = fieldnames (participant.notNormalized);
+        nStates = numel (states);
+
+        % pre-allocate the right quantity of data
+        participant.normalizeByFeature = participant.notNormalized;
+        
+        % For each State (for each participant)
+        for j = 1:nStates
+            state = participant.notNormalized.(states{j});
+            nTrials = size(state,1);
+            
+            % For each Trial (for each state for each participant)
+            for k = 1:nTrials
+                % get data within that trial and save to svmmatrix
+                participant.normalizeByFeature.(states{j})(k,1,:) = data (index,1:nChans);
+                participant.normalizeByFeature.(states{j})(k,2,:) = data (index, nChans+1:2*nChans);
+                index = index + 1;
+            end
+        end
+        participantSet.(participants{i}).normalizeByFeature = participant.normalizeByFeature;
+    else
+        %its not training data
+    end
 end
 end
