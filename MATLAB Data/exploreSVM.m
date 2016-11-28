@@ -12,6 +12,7 @@ load('participantSet.mat');
 [X_notNormalized, Y_notNormalized] = getNotNormalized(participantSet);
 [X_NormPerson, Y_NormPerson] = getNormalizeByParticipant(participantSet);
 [X_NormFeature, Y_NormFeature] = getNormalizeByFeature(participantSet);
+
  
 
 %%%%%%%%%%%%%%%%change
