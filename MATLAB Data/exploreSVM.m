@@ -9,11 +9,30 @@ load('participantSet.mat');
 %Y = classifier;
 
 %[X, Y] = trainSVM(participantSetNotNormalized);
-[X_notNormalized, Y_notNormalized, X_NormPerson, Y_NormPerson, X_NormFeature, Y_NormFeature] = trainSVM(participantSet);
+[X_notNormalized, Y_notNormalized] = getNotNormalized(participantSet);
+[X_NormPerson, Y_NormPerson] = getNormalizedByParticipant(participantSet);
+[X_NormFeature, Y_NormFeature] = getNormalizedByFeature(participantSet);
+ 
 
-%only look at the firs 18 training sets
-%Y = Y(1:18,:);
-%X = X(1:18,:);
+%%%%%%%%%%%%%%%%change
+% 0 = linear, 1 = gaussian
+svm = 1;
+
+% 0 = notNormalized, 1 = NormPerson, 2 = NormFeature
+dataSet = 0; 
+%%%%%%%%%%%%%%%%%%%%%change
+
+
+if (dataSet == 0)
+    X = X_notNormalized;
+    Y = Y_notNormalized;
+elseif(dataSet == 1)
+    X = X_NormPerson;
+    Y = Y_NormPerson;
+elseif(dataSet == 2)
+    X = X_NormFeature;
+    Y = Y_NormFeature;
+end 
 
 %set trainingSetNum based on X number of rows
 trainingSetNum = size(X, 1);
