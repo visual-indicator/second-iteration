@@ -1,4 +1,4 @@
-function [ svmMatrix, svmClassifier ] = getNormalizedPerParticipant ( participantSet )
+function [ svmMatrix, svmClassifier ] = getNormalizeByParticipant ( participantSet )
 % TRAINSVM Output the data within participantSet as a matrix and vector
 % Usage: [svmMatrix, svmClassifier] = trainSVM(participantSet);
 

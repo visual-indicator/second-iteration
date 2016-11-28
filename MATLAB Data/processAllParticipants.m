@@ -2,12 +2,6 @@ function [ participantSet ] = processAllParticipants ( EEG )
 %PROCESSALLPARTICIPANTS Processes all participants data
 % Open all data sets in EEGLab
   
-%%% Options %%%
-
-% Normalize by person (default) or by feature (set below to TRUE)
-normalizeByFeature = false;
-
-
 %%% Read and Separate Participant Data %%%
 
 participantSet = struct();
@@ -40,20 +34,15 @@ participants = fieldnames(participantSet);
 % process each participants' data
 for i = 1:numel(participants)
     if (participants{i}(1) == 'P')
-        participants(i)
+        participants(i)                         %print out participant name
         participantSet.(participants{i}) = processOneParticipant(participantSet.(participants{i}));
     else 
-        participants(i)
+        participants(i)                         %print out participant name
         participantSet.(participants{i}) = processOneTraining(participantSet.(participants{i}));
     end
 end
 
 participantSet = normalizeDataByFeature(participantSet);
-
-if (normalizeByFeature)
-    % load the processedData of each participant, normalize each row, then
-    % put it back
-end
 
 % and now we have the whole set!
 end
@@ -148,8 +137,11 @@ function [ p ] = processOneTraining ( pData )
 %%% Event Codes %%%
 
 HAPPY       = 1;
+HAPPYCHAR   = '1';
 NEUTRAL     = 2;
+NEUTRALCHAR = '2';
 SAD         = 3;
+SADCHAR     = '3';
 
 %%% Constants and Input Data %%%
 
@@ -175,17 +167,17 @@ s   = 0;
 %%% Restructure Filtered Data %%%
 
 for i = 1:nEpochs
-    if (events(i).type == HAPPY)
+    if (events(i).type == HAPPY || events(i).type == HAPPYCHAR)
         h = h+1;
         filteredData.happy(h,1,:,:) = alpha(:,:,j);
         filteredData.happy(h,2,:,:) = beta(:,:,j);
         j = j+1;
-    elseif (events(i).type == NEUTRAL)
+    elseif (events(i).type == NEUTRAL || events(i).type == NEUTRALCHAR)
         n = n+1;
         filteredData.neutral(n,1,:,:) = alpha(:,:,j);
         filteredData.neutral(n,2,:,:) = beta(:,:,j);        
         j = j+1;
-    elseif (events(i).type == SAD)
+    elseif (events(i).type == SAD || events(i).type == SADCHAR)
         s = s+1;
         filteredData.sad(s,1,:,:) = alpha(:,:,j);
         filteredData.sad(s,2,:,:) = beta(:,:,j);  
@@ -227,6 +219,7 @@ p.normalizePerPerson            = normalizedPerPerson;
 %p.normalizedByFeaturePerPerson  = normalizedByFeaturePerPerson;
 
 end
+
 
 %%
 function [ PSD ] = getSumPSD( data )
@@ -322,6 +315,7 @@ end
 
 end
 
+
 %%
 function [ processedData ] = normalize_training_per_person_and_feature( processedData )
 
@@ -358,6 +352,7 @@ end
 
 end
 
+
 %% 
 function [ matrix_normalized ] = normalize_1D ( matrix ) 
 
@@ -386,6 +381,7 @@ for i = 1:size(matrix,1)
     matrix_normalized(i,1) = (matrix(i,1) - min) / den;
 end
 end
+
 
 %%
 function [ participantSet ] = normalizeDataByFeature ( participantSet )
@@ -490,4 +486,5 @@ for i = 1:nParticipants
         %its not training data
     end
 end
+
 end
