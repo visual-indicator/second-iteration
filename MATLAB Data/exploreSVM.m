@@ -17,10 +17,10 @@ load('participantSet.mat');
 
 %%%%%%%%%%%%%%%%change
 % 0 = linear, 1 = gaussian
-svm = 0;
+svm = 1;
 
 % 0 = notNormalized, 1 = NormPerson, 2 = NormFeature
-dataSet = 2; 
+dataSet = 0; 
 %%%%%%%%%%%%%%%%%%%%%change
 
 
