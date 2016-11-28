@@ -44,12 +44,12 @@ for i = 1:nParticipants
     
     if (name(1) == 'T')
         % it's training data 
-        states  = fieldnames (participant.normalizedByFeature);
+        states  = fieldnames (participant.normalizeByFeature);
         nStates = numel (states);
 
         % For each State (for each participant)
         for j = 1:nStates
-            state = participant.normalizedByFeature.(states{j});
+            state = participant.normalizeByFeature.(states{j});
             nTrials = size(state,1);
             
             % For each Trial (for each state for each participant)
