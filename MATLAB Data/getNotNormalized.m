@@ -68,7 +68,4 @@ for i = 1:nParticipants
     end
 end
 
-for i = 1:size(svmMatrix,2)
-   svmMatrix(:,i) = normalize_1D(svmMatrix(:,i)); 
-end
 end
