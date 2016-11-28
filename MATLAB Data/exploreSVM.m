@@ -17,10 +17,10 @@ load('participantSet.mat');
 
 %%%%%%%%%%%%%%%%change
 % 0 = linear, 1 = gaussian
-svm = 1;
+svm = 0;
 
 % 0 = notNormalized, 1 = NormPerson, 2 = NormFeature
-dataSet = 0; 
+dataSet = 2; 
 %%%%%%%%%%%%%%%%%%%%%change
 
 
@@ -38,9 +38,6 @@ end
 %set trainingSetNum based on X number of rows
 trainingSetNum = size(X, 1);
 
-%if linear svm = 0;
-%if gaussian svm = 1;
-svm = 1;
 
 
 %%%%%%%%%%%%%%%%%%%%% #1 Alpha and beta value for each channel%%%%%%%%%%%%%%%%%%%%%%%
