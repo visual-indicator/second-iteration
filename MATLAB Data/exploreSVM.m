@@ -10,7 +10,7 @@ load('participantSet.mat');
 
 %[X, Y] = trainSVM(participantSetNotNormalized);
 [X_notNormalized, Y_notNormalized] = getNotNormalized(participantSet);
-[X_NormPerson, Y_NormPerson] = getNormalizedByParticipant(participantSet);
+[X_NormPerson, Y_NormPerson] = getNormalizedPerParticipant(participantSet);
 [X_NormFeature, Y_NormFeature] = getNormalizedByFeature(participantSet);
  
 
