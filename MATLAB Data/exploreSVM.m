@@ -9,7 +9,7 @@ load('participantSet.mat');
 %Y = classifier;
 
 %[X, Y] = trainSVM(participantSetNotNormalized);
-[X, Y] = trainSVM(participantSet);
+[X_notNormalized, Y_notNormalized, X_NormPerson, Y_NormPerson, X_NormFeature, Y_NormFeature] = trainSVM(participantSet);
 
 %only look at the firs 18 training sets
 %Y = Y(1:18,:);
