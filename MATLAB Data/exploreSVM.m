@@ -38,9 +38,6 @@ end
 %set trainingSetNum based on X number of rows
 trainingSetNum = size(X, 1);
 
-%if linear svm = 0;
-%if gaussian svm = 1;
-svm = 1;
 
 
 %%%%%%%%%%%%%%%%%%%%% #1 Alpha and beta value for each channel%%%%%%%%%%%%%%%%%%%%%%%
