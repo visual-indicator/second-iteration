@@ -20,7 +20,7 @@ load('participantSet.mat');
 svm = 1;
 
 % 0 = notNormalized, 1 = NormPerson, 2 = NormFeature
-dataSet = 0; 
+dataSet = 2; 
 %%%%%%%%%%%%%%%%%%%%%change
 
 
