@@ -30,7 +30,7 @@ end
 % Create svmMatrix
 %  NOTE: Even if the data doesn't match this exactly, it will prevent us from
 %  having to re-create a matrix EVERY time. A few times wouldn't be too bad
-nRows           = nTrainingSets * nStates * nTrials;
+nRows           = nTrainingSets;
 nCols           = nChans * nBands;
 svmMatrix       = zeros (nRows, nCols);
 svmClassifier   = zeros (nRows, 1);
@@ -55,12 +55,18 @@ for i = 1:nParticipants
             % For each Trial (for each state for each participant)
             for k = 1:nTrials
                 % get data within that trial and save to svmmatrix
-                temp = zeros (2*nChans, 1);
-                temp(1:nChans) = state(k,1,:);
-                temp(nChans+1:2*nChans)    = state(k,2,:);
-                svmMatrix(index, :)  = temp;
-                svmClassifier(index) = j;
-                index = index + 1;
+                if (state(k,1,1) == 0)
+                    %nah brah
+                elseif (state(k,1,1) == -Inf)
+                    %for real nah
+                else
+                    temp = zeros (2*nChans, 1);
+                    temp(1:nChans) = state(k,1,:);
+                    temp(nChans+1:2*nChans)    = state(k,2,:);
+                    svmMatrix(index, :)  = temp;
+                    svmClassifier(index) = j;
+                    index = index + 1;
+                end 
             end
         end
     else

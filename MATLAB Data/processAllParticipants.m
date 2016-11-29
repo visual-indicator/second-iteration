@@ -4,6 +4,8 @@ function [ participantSet ] = processAllParticipants ( EEG )
   
 %%% Read and Separate Participant Data %%%
 
+format compact;
+
 participantSet = struct();
 
 nSets = numel(EEG);
@@ -55,10 +57,15 @@ function [ p ] = processOneParticipant( pData )
 %%% Event codes %%%
 
 YELLOW      = 5;
+YELLOWCHAR  = '5';
 BLUE        = 7;
+BLUECHAR    = '7';
 GREEN       = 1;
+GREENCHAR   = '1';
 RED         = 2;
+REDCHAR     = '2';
 BASELINE    = 4;
+BASELINECHAR='4';
 
 %%% Constants and Input Data %%%
 
@@ -69,34 +76,34 @@ nBands  = 2;
 nChans  = 6;
 nSamps  = 2500;
 % TEMPORARY: allows us to only deal with ONE of each color
-numEpochs = 5;
+numEpochs = size(alpha, 3);
 
 temp = zeros(nBands, nChans, nSamps);         
 
 %%% Create Person Struct %%%
-p       = struct('filteredData', []); 
+p            = struct('filteredData', []); 
 filteredData = struct('yellow', temp, 'green', temp, 'blue', temp, 'red', temp, 'baseline', temp);
 
 n = 1;
 
 for i = 1:numEpochs
-    if (events(i).type == YELLOW)
+    if (events(i).type == YELLOW || events(i).type == YELLOWCHAR)
         filteredData.yellow(1,:,:) = alpha(:,:,n);
         filteredData.yellow(2,:,:) = beta(:,:,n);
         n = n+1;
-    elseif (events(i).type == BLUE)
+    elseif (events(i).type == BLUE || events(i).type == BLUECHAR)
         filteredData.blue(1,:,:) = alpha(:,:,n);
         filteredData.blue(2,:,:) = beta(:,:,n);        
         n = n+1;
-    elseif (events(i).type == GREEN)
+    elseif (events(i).type == GREEN || events(i).type == GREENCHAR)
         filteredData.green(1,:,:) = alpha(:,:,n);
         filteredData.green(2,:,:) = beta(:,:,n);        
         n = n+1;
-    elseif (events(i).type == RED)
+    elseif (events(i).type == RED || events(i).type == REDCHAR)
         filteredData.red(1,:,:) = alpha(:,:,n);
         filteredData.red(2,:,:) = beta(:,:,n);        
         n = n+1;
-    elseif (events(i).type == BASELINE)
+    elseif (events(i).type == BASELINE || events(i).type == BASELINECHAR)
         filteredData.baseline(1,:,:) = alpha(:,:,n);
         filteredData.baseline(2,:,:) = beta(:,:,n);
         n = n+1;
@@ -142,6 +149,8 @@ NEUTRAL     = 2;
 NEUTRALCHAR = '2';
 SAD         = 3;
 SADCHAR     = '3';
+BASELINE    = 4;
+BASELINECHAR='4';
 
 %%% Constants and Input Data %%%
 
@@ -157,7 +166,7 @@ temp = zeros(1, nBands, nChans, nSamps);
 
 %%% Create Person Struct %%%
 p               = struct('filteredData', [], 'processedData', []); 
-filteredData    = struct('happy', temp, 'neutral', temp, 'sad', temp);
+filteredData    = struct('happy', temp, 'neutral', temp, 'sad', temp, 'baseline', temp);
 
 j   = 1;
 h   = 0;
@@ -182,9 +191,13 @@ for i = 1:nEpochs
         filteredData.sad(s,1,:,:) = alpha(:,:,j);
         filteredData.sad(s,2,:,:) = beta(:,:,j);  
         j = j+1;
-    else
-        % ERROR
-        % Print something to say that we messed up
+    elseif (events(i).type == BASELINE || events(i).type == BASELINECHAR)
+        s = s+1;
+        filteredData.baseline(s,1,:,:) = alpha(:,:,j);
+        filteredData.baseline(s,2,:,:) = beta(:,:,j);  
+        j = j+1;
+    else 
+        str = 'Something went wrong...'
     end
 end
 
@@ -316,7 +329,7 @@ end
 end
 
 
-%%
+%% TODO: finish this function maybe someday
 function [ processedData ] = normalize_training_per_person_and_feature( processedData )
 
 states      = fieldnames(processedData);
@@ -334,12 +347,14 @@ for i = 1:nStates
     nTrials     = size(processedData.(states{i}),1);
     nPerState   = nTrials * nBands * nChans;
     
+    % TODO: fill matrix with data
+    
     %matrix(front:back) = reshape(processedData.(states{i}), nPerState, 1);
 end
 
 matrix_normalized = normalize_1D (matrix);
 
-% fold data back up
+% TODO: fold data back up
 for i = 1:nStates
     nTrials     = size(processedData.(states{i}),1);
     nPerState   = nTrials * nBands * nChans;
@@ -387,10 +402,6 @@ end
 function [ participantSet ] = normalizeDataByFeature ( participantSet )
     % For classification
 
-HAPPY           = 1;
-NEUTRAL         = 2;
-SAD             = 3;
-
 nChans          = 6;
 nBands          = 2;
 nStates         = 3;
@@ -437,11 +448,17 @@ for i = 1:nParticipants
             % For each Trial (for each state for each participant)
             for k = 1:nTrials
                 % get data within that trial and save to svmmatrix
-                temp = zeros (2*nChans, 1);
-                temp(1:nChans) = state(k,1,:);
-                temp(nChans+1:2*nChans)    = state(k,2,:);
-                data(index, :)  = temp;
-                index = index + 1;
+                if (state(k,1,1) == 0)
+                    %nah brah
+                elseif (state(k,1,1) == -Inf)
+                    %for real nah
+                else
+                    temp = zeros (2*nChans, 1);
+                    temp(1:nChans) = state(k,1,:);
+                    temp(nChans+1:2*nChans)    = state(k,2,:);
+                    data(index, :)  = temp;
+                    index = index + 1;
+                end
             end
         end
     else

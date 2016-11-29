@@ -7,6 +7,7 @@ function [ svmMatrix, svmClassifier ] = getNormalizeByFeature ( participantSet )
 HAPPY           = 1;
 NEUTRAL         = 2;
 SAD             = 3;
+BASELINE        = 4;
 
 nChans          = 6;
 nBands          = 2;
