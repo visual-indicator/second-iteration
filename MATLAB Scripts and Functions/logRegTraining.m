@@ -70,30 +70,34 @@ end
 
 
 %take average of both set of predicted values and compare the two
-disp('Data normalized by feature data:');
+%disp('Data normalized by feature data:');
 if (mean(predicted_lit_f) < mean(predicted_noLit_f))
     disp('Emotional responsed to video with green LED lights yields higher valence response to video without green LED lights');
-    output = sprintf('With lights is %.4f%% and wihtout lights is %.4f%%', mean(predicted_lit_f), mean(predicted_noLit_f));
+    output = sprintf('With lights is %.4f and wihtout lights is %.4f', mean(predicted_lit_f), mean(predicted_noLit_f));
     disp(output);
+    disp('Value closer to zero indicate more positive valence');
 elseif(mean(predicted_lit_f) > mean(predicted_noLit_f))
     disp('Emotional responsed to video without green LED lights yields higher valence response to video with green LED lights');
-    output = sprintf('With lights is %.4f%% and wihtout lights is %.4f%%', mean(predicted_lit_f), mean(predicted_noLit_f));
+    output = sprintf('With lights is %.4f and wihtout lights is %.4f', mean(predicted_lit_f), mean(predicted_noLit_f));
     disp(output);
+    disp('Value closer to zero indicate more positive valence');
 else
     disp('Average of emotional response to video with green LED lights and without green LED lights yield the same value');
 end
 
 
-disp('Data normalized by participant:');
-if (mean(predicted_lit_p) < mean(predicted_noLit_p))
-    disp('Emotional responsed to video with green LED lights yields higher valence response to video without green LED lights');
-    output = sprintf('With lights is %.4f%% and without lights is %.4f%%', mean(predicted_lit_p), mean(predicted_noLit_p));
-    disp(output);
-elseif(mean(predicted_lit_p) > mean(predicted_noLit_p))
-    disp('Data emotional responsed to video without green LED lights yields higher valence response to video with green LED lights');
-    output = sprintf('With lights is %.4f%% and without lights is %.4f%%', mean(predicted_lit_p), mean(predicted_noLit_p));
-    disp(output);
-else
-    disp('Average of emotional response to video with green LED lights and without green LED lights yield the same value');
-end
-    
+% disp('Data normalized by participant:');
+% if (mean(predicted_lit_p) < mean(predicted_noLit_p))
+%     disp('Emotional responsed to video with green LED lights yields higher valence response to video without green LED lights');
+%     output = sprintf('With lights is %.4f and without lights is %.4f', mean(predicted_lit_p), mean(predicted_noLit_p));
+%     disp(output);
+%     disp('Value closer to zero indicate more positive valence');
+% elseif(mean(predicted_lit_p) > mean(predicted_noLit_p))
+%     disp('Data emotional responsed to video without green LED lights yields higher valence response to video with green LED lights');
+%     output = sprintf('With lights is %.4f and without lights is %.4f', mean(predicted_lit_p), mean(predicted_noLit_p));
+%     disp(output);
+%     disp('Value closer to zero indicate more positive valence');
+% else
+%     disp('Average of emotional response to video with green LED lights and without green LED lights yield the same value');
+% end
+%     
