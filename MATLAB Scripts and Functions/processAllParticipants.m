@@ -166,12 +166,13 @@ temp = zeros(1, nBands, nChans, nSamps);
 
 %%% Create Person Struct %%%
 p               = struct('filteredData', [], 'processedData', []); 
-filteredData    = struct('happy', temp, 'neutral', temp, 'sad', temp, 'baseline', temp);
+filteredData    = struct('happy', [], 'neutral', [], 'sad', [], 'baseline', []);
 
 j   = 1;
 h   = 0;
 n   = 0;
 s   = 0; 
+b   = 0;
 
 %%% Restructure Filtered Data %%%
 
@@ -192,9 +193,9 @@ for i = 1:nEpochs
         filteredData.sad(s,2,:,:) = beta(:,:,j);  
         j = j+1;
     elseif (events(i).type == BASELINE || events(i).type == BASELINECHAR)
-        s = s+1;
-        filteredData.baseline(s,1,:,:) = alpha(:,:,j);
-        filteredData.baseline(s,2,:,:) = beta(:,:,j);  
+        b = b+1;
+        filteredData.baseline(b,1,:,:) = alpha(:,:,j);
+        filteredData.baseline(b,2,:,:) = beta(:,:,j);  
         j = j+1;
     else 
         str = 'Something went wrong...'
@@ -205,7 +206,8 @@ p.filteredData = filteredData;
 
 %%% Process Data %%%
 
-notNormalized = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nBands, nChans), 'sad', zeros(s, nBands, nChans));
+%notNormalized = struct('happy', zeros(h, nBands, nChans), 'neutral', zeros(n, nBands, nChans), 'sad', zeros(s, nBands, nChans));
+notNormalized = struct('happy', [], 'neutral', [], 'sad', [], 'baseline', []);
 
 labels  = fieldnames(notNormalized);
 
@@ -225,11 +227,11 @@ end
 % Normalize the Participant's Data %
 
 normalizedPerPerson             = normalize_training(notNormalized);
-%normalizedByFeaturePerPerson    = normalize_training_per_person_and_feature(notNormalized);
+normalizedByFeaturePerPerson    = normalize_training_per_person_and_feature(notNormalized);
 
 p.notNormalized                 = notNormalized;
 p.normalizePerPerson            = normalizedPerPerson;
-%p.normalizedByFeaturePerPerson  = normalizedByFeaturePerPerson;
+p.normalizedByFeaturePerPerson  = normalizedByFeaturePerPerson;
 
 end
 
@@ -330,39 +332,46 @@ end
 
 
 %% TODO: finish this function maybe someday
-function [ processedData ] = normalize_training_per_person_and_feature( processedData )
+function [ normalized ] = normalize_training_per_person_and_feature( notNormalized )
 
-states      = fieldnames(processedData);
+states      = fieldnames(notNormalized);
 nStates     = numel (states);
-nTrials     = size (processedData.(states{1}), 1);
-nBands      = size (processedData.(states{1}), 2); 
-nChans      = size (processedData.(states{1}), 3);
+nTrials     = size (notNormalized.(states{1}), 1);
+nBands      = size (notNormalized.(states{1}), 2); 
+nChans      = size (notNormalized.(states{1}), 3);
 nPerState   = nTrials * nBands * nChans;
 
-matrix = zeros(nTrials * nStates, nBands * nChans);
+matrix = zeros(nTrials, nBands * nChans);
+
+index = 1;
 
 % unfold data
 for i = 1:nStates
     
-    nTrials     = size(processedData.(states{i}),1);
-    nPerState   = nTrials * nBands * nChans;
+    nTrials = size(notNormalized.(states{i}),1);
+    front   = index;
+    back    = index + nTrials;
     
-    % TODO: fill matrix with data
-    
-    %matrix(front:back) = reshape(processedData.(states{i}), nPerState, 1);
+    matrix(front:back,1:nChans)             = squeeze(notNormalized.(states{i})(:,1,:));
+    matrix(front:back,nChans+1:2*nChans)    = squeeze(notNormalized.(states{i})(:,2,:));
 end
 
-matrix_normalized = normalize_1D (matrix);
+for i = 1:size(matrix,2)
+    matrix_normalized = normalize_1D(matrix(:,i));
+end
+
+index = 1;
 
 % TODO: fold data back up
 for i = 1:nStates
-    nTrials     = size(processedData.(states{i}),1);
+    nTrials     = size(notNormalized.(states{i}),1);
     nPerState   = nTrials * nBands * nChans;
     
-    front   = (i - 1) * nPerState + 1;
-    back    = (i) * nPerState;
+    front   = index;
+    back    = index + nTrials;
     
-    processedData.(states{i}) = reshape(matrix_normalized(front:back), nTrials, nBands, nChans);
+    normalized.(states{i})(:,1,:) = matrix_normalized(front:back,1:nChans);
+    normalized.(states{i})(:,2,:) = matrix_normalized(front:back,1:nChans);
 end
 
 end
@@ -430,7 +439,7 @@ data            = zeros (nRows, nCols);
 
 index = 1;
 
-% For each Participant
+% Add each Training Set (video/1st iteration)
 for i = 1:nParticipants
     name = cell2mat(participants(i));
     participant = participantSet.(name);
@@ -447,18 +456,11 @@ for i = 1:nParticipants
             
             % For each Trial (for each state for each participant)
             for k = 1:nTrials
-                % get data within that trial and save to svmmatrix
-                if (state(k,1,1) == 0)
-                    %nah brah
-                elseif (state(k,1,1) == -Inf)
-                    %for real nah
-                else
-                    temp = zeros (2*nChans, 1);
-                    temp(1:nChans) = state(k,1,:);
-                    temp(nChans+1:2*nChans)    = state(k,2,:);
-                    data(index, :)  = temp;
-                    index = index + 1;
-                end
+                temp                    = zeros (2*nChans, 1);
+                temp(1:nChans)          = state(k,1,:);
+                temp(nChans+1:2*nChans) = state(k,2,:);
+                data(index, :)          = temp;
+                index                   = index + 1;
             end
         end
     else
@@ -466,13 +468,39 @@ for i = 1:nParticipants
     end
 end
 
+% Add each Testing set (colors/2nd iteration)
+for i = 1:nParticipants
+    name = cell2mat(participants(i));
+    participant = participantSet.(name);
+    
+    if (name(1) == 'P')
+        % it's testing data 
+        colors  = fieldnames (participant.notNormalized);
+        nColors = numel (colors);
+
+        % For each State (for each participant)
+        for j = 1:nColors
+            color                   = participant.notNormalized.(colors{j});
+            temp                    = zeros (2*nChans, 1);
+            temp(1:nChans)          = color(1,:);
+            temp(nChans+1:2*nChans) = color(2,:);
+            data(index, :)          = temp;
+            index                   = index + 1;
+        end
+    else
+        %its not training data
+    end
+end
+
+%%% Normalize data %%%
+
 for i = 1:size(data,2)
    data(:,i) = normalize_1D(data(:,i)); 
 end
 
 index = 1;
 
-% put normalized data back
+% Put normalized training data back (video/1st iteration)
 for i = 1:nParticipants
     name = cell2mat(participants(i));
     participant = participantSet.(name);
@@ -497,6 +525,32 @@ for i = 1:nParticipants
                 participant.normalizeByFeature.(states{j})(k,2,:) = data (index, nChans+1:2*nChans);
                 index = index + 1;
             end
+        end
+        participantSet.(participants{i}).normalizeByFeature = participant.normalizeByFeature;
+    else
+        %its not training data
+    end
+end
+
+% Put normalized testing data back (colors/2nd iteration)
+for i = 1:nParticipants
+    name = cell2mat(participants(i));
+    participant = participantSet.(name);
+    
+    if (name(1) == 'P')
+        % it's training data 
+        colors  = fieldnames (participant.notNormalized);
+        nStates = numel (colors);
+
+        % pre-allocate the right quantity of data
+        participant.normalizeByFeature = participant.notNormalized;
+        
+        % For each State (for each participant)
+        for j = 1:nStates
+            % get data within that trial and save to svmmatrix
+            participant.normalizeByFeature.(colors{j})(1,:) = data (index,1:nChans);
+            participant.normalizeByFeature.(colors{j})(2,:) = data (index, nChans+1:2*nChans);
+            index = index + 1;
         end
         participantSet.(participants{i}).normalizeByFeature = participant.normalizeByFeature;
     else

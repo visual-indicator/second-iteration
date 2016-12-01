@@ -54,19 +54,12 @@ for i = 1:nParticipants
             
             % For each Trial (for each state for each participant)
             for k = 1:nTrials
-                % get data within that trial and save to svmmatrix
-                if (state(k,1,1) == 0)
-                    %nah brah
-                elseif (state(k,1,1) == -Inf)
-                    %for real nah
-                else
-                    temp = zeros (2*nChans, 1);
-                    temp(1:nChans) = state(k,1,:);
-                    temp(nChans+1:2*nChans)    = state(k,2,:);
-                    svmMatrix(index, :)  = temp;
-                    svmClassifier(index) = j;
-                    index = index + 1;
-                end 
+                temp = zeros (2*nChans, 1);
+                temp(1:nChans) = state(k,1,:);
+                temp(nChans+1:2*nChans)    = state(k,2,:);
+                svmMatrix(index, :)  = temp;
+                svmClassifier(index) = j;
+                index = index + 1;
             end
         end
     else
